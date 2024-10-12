@@ -88,32 +88,33 @@ class MLPConv2d(nn.Module):
         
         # Use unfold to extract sliding local blocks
         # Output shape: (batch_size, in_channels * kernel_height * kernel_width, L)
-        patches = F.unfold(x, 
-                           kernel_size=self.kernel_size, 
-                           dilation=self.dilation, 
-                           padding=self.padding, 
-                           stride=self.stride)  # shape: (B, C*K*K, L)
+        patches = F.unfold(
+            x,
+            kernel_size=self.kernel_size,
+            dilation=self.dilation,
+            padding=self.padding,
+            stride=self.stride
+        )  # shape: (B, C*K*K, L)
         
         # Transpose to (batch_size, L, C*K*K)
         patches = patches.transpose(1, 2)  # shape: (B, L, C*K*K)
         
-        # Reshape to (B * L, C*K*K)
-        patches = patches.reshape(-1, self.input_size)  # shape: (B*L, C*K*K)
-        
-        # Pass through MLP
-        outputs = self.mlp(patches)  # shape: (B*L, out_channels)
-        
-        # Reshape to (B, L, out_channels)
-        outputs = outputs.reshape(batch_size, -1, self.out_channels)  # shape: (B, L, out_channels)
+        # Pass through MLP directly without reshaping
+        outputs = self.mlp(patches)  # shape: (B, L, out_channels)
         
         # Compute output spatial dimensions
-        H_out = (H + 2 * self.padding[0] - self.dilation[0]*(self.kernel_size[0]-1) -1) // self.stride[0] + 1
-        W_out = (W + 2 * self.padding[1] - self.dilation[1]*(self.kernel_size[1]-1) -1) // self.stride[1] + 1
+        H_out = (
+            (H + 2 * self.padding[0] - self.dilation[0] * (self.kernel_size[0] - 1) - 1) // self.stride[0]
+        ) + 1
+        W_out = (
+            (W + 2 * self.padding[1] - self.dilation[1] * (self.kernel_size[1] - 1) - 1) // self.stride[1]
+        ) + 1
         
-        # Transpose to (B, out_channels, H_out, W_out)
+        # Reshape to (B, out_channels, H_out, W_out)
         outputs = outputs.transpose(1, 2).contiguous().view(batch_size, self.out_channels, H_out, W_out)
         
         return outputs
+
 
 # Test Case to Verify MLPConv2d behaves like Conv2d when num_layers=1
 def test_mlpconv2d():

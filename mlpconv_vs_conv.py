@@ -251,6 +251,8 @@ def main():
     plt.ylabel('Loss')
     plt.title('Training and Validation Loss')
     plt.legend()
+    plt.annotate(f'ConvNet Params: {conv_params}', xy=(0.5, 0.01), xycoords='axes fraction', ha='center', fontsize=8)
+    plt.annotate(f'MLPConvNet Params: {mlpconv_params}', xy=(0.5, 0.05), xycoords='axes fraction', ha='center', fontsize=8)
 
     # Plot Accuracy
     plt.subplot(1, 2, 2)
@@ -262,6 +264,8 @@ def main():
     plt.ylabel('Accuracy (%)')
     plt.title('Training and Validation Accuracy')
     plt.legend()
+    plt.annotate(f'ConvNet Params: {conv_params}', xy=(0.5, 0.01), xycoords='axes fraction', ha='center', fontsize=8)
+    plt.annotate(f'MLPConvNet Params: {mlpconv_params}', xy=(0.5, 0.05), xycoords='axes fraction', ha='center', fontsize=8)
 
     plt.tight_layout()
     plt.savefig('training_curves.png')
